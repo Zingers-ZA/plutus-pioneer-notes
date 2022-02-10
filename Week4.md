@@ -407,8 +407,25 @@ Notes:
 
 ## 4. HomeWork:
 
+Notes:
 
-
+```
+payContract :: Contract () PaySchema Text ()
+payContract = do
+    pp <- awaitPromise $ endpoint @"pay" return                                      - return here will just immediately return the passed in endpoint params
+    let tx = mustPayToPubKey (ppRecipient pp) $ lovelaceValueOf $ ppLovelace pp      
+    void $ submitTx tx
+    payContract
+```
+- `submitTx` takes the config of `tx` and builds an actual transaction. It automatically balances the tx by finding the appropriate utxos in your wallet and also generates the right amount of change that must come back to the wallet. It also takes fees into account. Then submits the tx to the blockchain
+- There is an extension: `{-# LAN.. NumericUnderscores #-}`, which lets you write lovelace with underscores so it's easier to see. eg. `10_000_000`
+- to create an instance of a type to pass to a function use: `VestingParam
+                { beneficiary = gpBeneficiary gp
+                , deadline    = gpDeadline gp
+                }` ( from week03 - paramatized)
+- Handling an error on a peice of computation can be done with : `handleError (\err -> Contract.logInfo $ "caught error: " ++ unpack err) $ void $ submitTx tx`
+    - this handles an error that is thrown when executing `void $ submitTx tx`
+- Setting a var in a do command `let pkh = mockWalletPaymentPubKeyHash $ knownWallet 2`.
 
 
 

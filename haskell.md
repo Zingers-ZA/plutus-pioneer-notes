@@ -1,6 +1,9 @@
 # Haskell Notes:
 
 
+- Setting a var in a do command `let pkh = mockWalletPaymentPubKeyHash $ knownWallet 2`. (no `in` required)
+
+
 ### Multiple constructors:
 ```
 myFunc :: ... -> ... -> ...
