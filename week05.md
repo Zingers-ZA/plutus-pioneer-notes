@@ -48,7 +48,7 @@ Adding loveLace:
 Creating values containing native tokens:  
 `singleton :: CurrencySymbol -> TokenName -> Integer -> Value`
 - Contsruct a value, consisting of one `AssetClass` and the Int specifies the amount of that token  
-- <b>NB</b>: The CurrencySymbol must be a string representing a hexadecimal value
+- <b>NB</b>: The CurrencySymbol must be a string representing a hexadecimal value(because it is the hash of the minting policy for that symbol)
     - The reason for this is because it is the hash of the minting policy
 - Because singleton returns a Value, it also implements mappend and can be added with `<>`  
 eg:   
@@ -89,4 +89,63 @@ The reason for the CurrencySymbol being a hex value, is because it is the hash o
     - The script must also be included in the tx
     - That script is then executed along with the other validation scripts
     - The purpose of these validation scripts is to decide whether this tx can mint/burn these tokens
+
+## 2. Simple minting policy:
+
+```
+ScriptContext:
+    scriptContextTxInfo :: TxInfo
+    scriptContextPurpose :: ScriptPurpose
+
+ScriptPurpose:
+    Minting (CurrencySymbol)
+    Spending (TxOutRef)
+    Rewarding (StakingCredential)
+    Certifying (DCert)
+```
+
+- In all the previous examples we have always used the 'Spending' ScriptPurpose 
+- <b>A script becomes a minting script when the value of `txInfoMint` is not zero</b>
+
+#### TxInfo:
+```
+TxInfo
+    txInfoInputs :: [TxInInfo]
+    txInfoOutputs :: [TxOut]
+    txInfoFee :: Value
+    txInfoMint :: Value
+    txInfoDCert :: [DCert]
+    ...
+```
+
+- `txInfoMint` can contain multiple currency symbols
+    - each currency symbol is the hash of a script
+    - <b>for each currency symbol that is going to be minted by this tx, the corresponding minting policy is looked up and executed</b>
+    - all policies must pass, if one fails they will all fail
+    - these minting policy scripts only have 2 inputs and the context(no datum)
+
+### Minting Policy Validators:
+```
+mkPolicy :: () -> SciptContext -> Bool
+mkPolicy () _ = True 
+
+policy :: Scripts.MintingPolicy
+policy :: mkMintingPolicyScript $$(PlutusTx.compile [|| Scripts.wrapMintingPolicy mkPolicy ||])    - converts to plutus core
+
+curSymbol :: CurrencySymbol
+curSymbol = scriptCurrencySymbol policy
+```
+Notes:
+- The above code allows all minting and burning of the CurrencySymbol associated with this policy
+- There is no datum for minting policy
+- Similar to a script validator you must compile minting policies to plutus core
+- Everything inside the oxford brackets(`[||]`) must be pre compilable, use `{-# INLINABLE mkPolicy #-}`
+- Similarly to how you can have parameterise script validators you can also have parameterized minitng policies
+
+3. More Realistic Minting Policy:
+
+
+
+
+
 
