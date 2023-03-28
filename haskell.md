@@ -11,6 +11,16 @@ Haskell unit type: `()` - no arguments, one value, unit
 - `newType` creates new type
 
 
+### Data and accessors:
+```
+data VestingDatum = VestingDatum
+    { beneficiary :: PubKeyHash
+    , deadline    :: POSIXTime
+    }
+```
+- beneficiary can be accessed via `beneficiary VestingDatum`
+
+
 ### functions: 
 ```
      name   arg1Type arg2Type outputType
