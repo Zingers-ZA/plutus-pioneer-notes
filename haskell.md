@@ -1,8 +1,28 @@
 # Haskell Notes:
 
+Haskell unit type: `()` - no arguments, one value, unit
+- similar to void type in other languages
 
 - Setting a var in a do command `let pkh = mockWalletPaymentPubKeyHash $ knownWallet 2`. (no `in` required)
 
+
+### Types:
+
+- `newType` creates new type
+
+
+### functions: 
+```
+     name   arg1Type arg2Type outputType
+    myFunc :: ...   -> ... -> ...
+    myFunc     _      _   =   ()
+               ^      ^        ^ 
+          arg1Name arg2Name returnValue
+```
+calling a function:
+```
+myFunc "hello"
+```
 
 ### Multiple constructors:
 ```
