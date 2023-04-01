@@ -21,3 +21,4 @@ getting current tip of local chain:
 
 getting utxos owned by address:  
 `cardano-cli query utxo --address <address> --testnet-magic 2`
+
