@@ -22,7 +22,7 @@
 - the code that is executed by the nodes is Untyped Plutus Core
     - meaning you an theoretically compile any language to this language if you create a compiler for it. 
 
-### high level steps to deploy scripts 
+### high level steps to deploy validator scripts 
 
 1. create `script address`
     - this is the address that the script utxo will sit at
@@ -102,10 +102,13 @@
         - inputs exist
         - pays correct fees
         - correct collateral
-        - if this phase fails, the tx fails without costing fees or collateral
-    2. runs all scripts included in the transaction
-        - if the scripts validate the tx actions, the node will add the transaction to the ledge and collect fees
-        - `all scripts must succeed`
+        - script hashes(if any) match script hash in address
+        - all corresponding private keys have signed for attached pubkeys
+        - <b>NB: if this phase fails, the tx fails without costing fees or collateral</b>
+    2. runs all scripts included in the transaction(including ref scripts)
+        - if the scripts validate the tx actions, the node will add the transaction to the ledger and collect fees
+        - if any script fails, node collects collateral and ignores following scripts(if any)
+        - <b>NB: all scripts must succeed</b>
 
 ### Determinism
 - offchain code can fully evaluate whether a transaction will succeed before it ever reaches a node

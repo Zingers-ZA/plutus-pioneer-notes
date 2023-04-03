@@ -1,0 +1,15 @@
+# quick fire
+- `producing transaction(producer)` the transaction which creates a utxo that will sit at a script address  
+- `spending/consuming transaction(consumer)` the transaction that consumes the utxo owned by a script  
+- `address` bech32 code with 2 parts
+    - first part either publickey hash or script hash
+        - if pubkey, tx must be signed by priv key, if script, script will be executed and must return true
+    - second part staking credentials
+- `datum` arbitrary data defined at the point of the producing transaction
+    - hash included by producer or
+    - actual datum included in tx body or
+    - datum attached to utxo(inline)
+- `redeemer` arbitrary data provided at the point of the spending transaction, 'unlocks output'
+- `script` validation logic that governs spending of utxos it owns
+    - included in consuming transaction, or in reference script
+- `script parameter` arbitrary data baked into the script at compilation to allow multiple uses for the same script code
