@@ -42,9 +42,9 @@ meaning that the validator compiler will need to be adapted to accept the param
 --                                        note the new param
 --                                         vvv
 mkWrappedParameterizedVestingValidator :: VestingParams -> BuiltinData -> BuiltinData -> BuiltinData -> ()
-mkWrappedParameterizedVestingValidator = wrap . mkParameterizedVestingValidator
---                                            ^^
---                                     dot syntax required here
+mkWrappedParameterizedVestingValidator = wrapValidator . mkParameterizedVestingValidator
+--                                                     ^^
+--                                           dot syntax required here
 ```
 
 ### Step 2 - update the validator 

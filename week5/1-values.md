@@ -3,19 +3,22 @@
 - utxo's store value, and up until now in the lectures value has only been in the context of ada(lovelace)
 - if you want to create tokens other than lovelace, you must create them, or burn them 
 
+
 ### Value type:
 ```
 Value 
     getValue :: Map CurrencySymbol (Map TokenName Integer)
                         ^^^              ^^^        ^^^
-                'HOSKY' for eg.      HoskyToken    150
+                minting script hash    HoskyToken   150
 ```
 - token on cardano is defined by a `CurrencySymbol` and a `Name`
 - CurrencySymbol and TokenName are both `BuiltInByteString`
+    - <b>NB: CurrencySymbol is a hex value, and is the script hash of the minting policy for the token</b>
 - `AssetClass` is a type wrapper for a pair of CurrencySymbol and TokenName
     - Ada is an assetclass
     - all native tokens are also assetClasses
     - the value type above is isomorphic to an AssetClass because of the structure being roughly the same. ie. a map of CurrencySymbol + TokenName -> Amount
+- Values use either a `positive amount to mint` or a `negative amount to burn`
 - Because ADA is the default value, the CurrencySymbol and Token Name are both '' for it
 
 helper function called `assetClassValue`

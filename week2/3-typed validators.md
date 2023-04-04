@@ -4,7 +4,7 @@
 
 below script checks that the redeemer == 42
 ```
-mk42Validator :: () -> Integer -> Integer -> PlutusV2.ScriptContext -> Bool
+mk42Validator :: () -> Integer -> -> PlutusV2.ScriptContext -> Bool
 mk42Validator _ r _ = r == 42
 ```
 - changed BuiltInData to actual types

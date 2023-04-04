@@ -15,7 +15,22 @@
 
 - `lucid.wallet.address()` returns string address of currently loaded wallet
 
-# Data:
+# utxos:
+
+```
+const vestingScript: SpendingValidator = {
+    type: "PlutusV2",
+    script: "..."
+};
+
+const addr = lucid.utils.validatorToAddress(vestingScript)
+
+// or const addr = lucid.wallet.address()
+
+await lucid.utxosAt(addr); // [UTxo]
+```
+
+# 'Data':
 
 - `Lucid.Data` gives access to all serializable BuiltInData types
     - `Data.String`
@@ -48,30 +63,6 @@ async function vestFunds(amount: bigint): Promise<TxHash> {
 ```
 
 
-# validators
-
-```
-const vestingScript: SpendingValidator = {
-    type: "PlutusV2",
-    script: "..."
-};
-```
-- the script '...' above would be the cbor hex of the actual script compiled to Untyped Plutus Core
-
-- `lucid.utils.validatorToAddress(vestingScript)` here would give the address of the script
-
-# utxos:
-
-```
-const vestingScript: SpendingValidator = {
-    type: "PlutusV2",
-    script: "..."
-};
-
-const addr = lucid.utils.validatorToAddress(vestingScript)
-
-await lucid.utxosAt(addr); // [UTxo]
-```
 
 # transactions
 
@@ -79,7 +70,7 @@ await lucid.utxosAt(addr); // [UTxo]
     1. under construction
         - `Tx` type
             - contains functions to build transactions 
-                - `.addSigner` - flag required signature
+                - `.addSignerKey` - flag required signature
                 - `.collectFrom` - input utxos
                 - use `.complete()` at the end to create a `Promise<TxComplete>` from a `Tx`
     2. constructed but not signed
@@ -130,6 +121,93 @@ async function claimVestedFunds(): Promise<TxHash> {
     }
     else return "No UTxO's found that can be claimed"
 }
+```
+
+#### transaction building
+
+there are a few functions commonly used during tx building
+- `.collectFrom` defines which utxos to consume
+    - this adds inputs to `ScriptContext.txInfo.txInInfo`
+- `.mintAssets` flags that the transaction will mint assets
+    - this attaches info to `ScriptContext.txInfo.txInfoMint` in the background
+- `.validFrom` sets the `ScriptContext.txInfo.txInfoValidRange` to start at a point and end at +infinity
+
+
+
+# validators/scripts 
+
+```
+const vestingScript: SpendingValidator = {
+    type: "PlutusV2",
+    script: "..."
+};
+```
+- the script '...' above would be the cbor hex of the actual script compiled to Untyped Plutus Core
+- `lucid.utils.validatorToAddress(vestingScript)` here would give the address of the script
+
+#### interacting with scripts
+
+there are a couple functions useful for working with scripts:
+- `attachSpendingValidator(vestingScript)`, this attaches a script to the transaction
+- `attachMintingPolicy(policy)`, attaches minting policy script for purposed of minting
+- `.addSignerKey(pkh)`, attaches signature of a signer to tx, this is required if Plutus scripts need to validate that a signer was present 
+    - even if the signee of the entire tx is the required signee, plutus doesn't have context of that, so you must attach it again here
+
+#### script parameters
+quick recap:
+- script params are compiled into the script before a transaction can produce an output that sits at that script address
+- this means that if one of your params needs to come from the user, you need to compile the script on the fly with their param
+- lucid does this with `applyParamsToScript`. Eg:
+```
+const addr: Address = await lucid.wallet.address();
+
+const pkh: string = getAddressDetails(addr).paymentCredential?.hash || "";
+
+const Params = Data.Tuple([Data.String]);
+type Params = Data.Static<typeof Params>;
+
+const signedPolicy: MintingPolicy = {
+    type: "PlutusV2",
+    script: applyParamsToScript<Params>(
+        "590..32fda",
+        [pkh],
+        Params)
+};
+```
+- this applies a given set of params to a partially compiled script
+    - partially compiled because this must be compiled without the params, so they can be applied later
+
+
+# Minting
+
+- effectively, need to create a script and include into a transaction that mints a Value with a CurrencySymbol that is the same as the script hash
+- Lucid uses a type called `Unit` to represent `AssetClass`
+- `fromText` is usefull to convert ascii(human) text to hex
+
+```
+const freePolicy: MintingPolicy = {
+    type: "PlutusV2",
+    script: "5830582e010000323222320053333573466e1cd55ce9baa0024800080148c98c8014cd5ce249035054310000500349848005"
+};
+
+const policyId: PolicyId = lucid.utils.mintingPolicyToId(freePolicy);
+                                        ^^^^^
+                       gets policyId(script hash) from minting policy
+
+const unit: Unit = policyId + fromText("PPP Free");
+           ^^^             ^^^^^^
+  create 'assetclass'    CurrencySymbol + tokenName
+
+const tx = await lucid
+    .newTx()
+    .mintAssets({[unit]: 10000}, Data.void())         <-- minting assets: contains Value, and redeemer
+                  ^^      ^^         ^^
+            assetClass   amount      redeemer
+    .attachMintingPolicy(freePolicy)                  <-- attach actual script to tx
+    .complete();
+
+const signedTx = await tx.sign().complete();
+const txHash = await signedTx.submit();
 ```
 
 

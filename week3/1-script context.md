@@ -20,3 +20,4 @@
 - `TxInfoRedeemers` 
 - `TxInfoData` -  this is a map from DatumHash to Datum, and is where datums need to be included for spending transactions
 - `TxInfoId` - the id of the transaction
+- `txInfoMint` - Info about tokens being minted, if non null triggers minting validation

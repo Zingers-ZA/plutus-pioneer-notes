@@ -105,5 +105,15 @@ This can be thought of in 2 ways
     - cheaper for consumer
     - most common
 
+# Fees
+
+- fees depened on 
+1. the size of the transaction in bytes
+2. the scripts that have to be run to validate the transaction
+    - scripts use more fees if they 
+    1. use more memory
+    2. have more steps to execute
 
 # blocks
+
+
