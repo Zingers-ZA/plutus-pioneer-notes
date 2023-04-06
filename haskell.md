@@ -12,6 +12,9 @@
     -- 's'
     ```
 - always use <b>lower case</b> for function and var names, because enums use <b>upper case</b>
+- difference between `do let x = y` and `do x <- y`
+    - `let` just sets x to y, the actual function y, not the result of it's output
+    - `<-` actually executes y, and puts it's result into x. This is called binding
 
 ### ghci
 
