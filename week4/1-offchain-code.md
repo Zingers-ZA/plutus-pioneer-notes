@@ -1,4 +1,5 @@
 # On chain vs Off chain Code
+https://www.youtube.com/watch?v=pTc_BJby5GU&list=PLNEK_Ejlx3x2j587Ox_nwEzmCO-elk8BG&ab_channel=IOGAcademy
 
 ### on chain
 - code that runs in the node, when validating a transaction

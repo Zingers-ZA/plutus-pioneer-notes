@@ -1,3 +1,4 @@
+https://www.youtube.com/watch?v=2MbzKzoBiak&list=PLNEK_Ejlx3x1-oF7NDy0MhXxG7k5O6ZOA&index=2&ab_channel=IOGAcademy
 # starting a local cardano node
 ```
  cardano-node run \

@@ -1,4 +1,5 @@
 ## Paramaterized Contracts
+https://www.youtube.com/watch?v=ZSKVu32c5eA&list=PLNEK_Ejlx3x2zXSjHRKLSc5Jn9vJFA3_O&index=4&ab_channel=IOGAcademy
 
 In the previous step (3-a vesting example) we used the datum to pass the beneficiary and deadline to the script
 This is not ideal since we know the rule is that any transaction that wants to spend the output at that script address would need to provide this datum as well

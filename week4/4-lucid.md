@@ -1,4 +1,5 @@
 # Lucid
+https://www.youtube.com/watch?v=BXz5V2rjbiE&list=PLNEK_Ejlx3x2j587Ox_nwEzmCO-elk8BG&index=4&ab_channel=IOGAcademy
 
 # General:
 

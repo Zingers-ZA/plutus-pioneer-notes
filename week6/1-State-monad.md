@@ -1,4 +1,5 @@
 # The state monad
+https://www.youtube.com/watch?v=8tWzG0ML6Z4&list=PLNEK_Ejlx3x08fHgl_ZTlowVO8bjqITEh&index=1&ab_channel=IOGAcademy
 
 - State monad is used extensively for testing plutus code
 

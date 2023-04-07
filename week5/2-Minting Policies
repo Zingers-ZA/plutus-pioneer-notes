@@ -1,4 +1,5 @@
 # Minting Policies
+https://www.youtube.com/watch?v=g_VoKPK-tk0&list=PLNEK_Ejlx3x2T1lIR4XnDILKukj3rPapi&index=4&ab_channel=IOGAcademy
 
 - inside the `Value` type, the `CurrencySymbol` is a hex string, because it is the script hash of the `minting policy script`
 - this `minting policy script` is what governs whether a transaction can mint or burn tokens

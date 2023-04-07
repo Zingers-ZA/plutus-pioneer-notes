@@ -1,4 +1,5 @@
 # Values in cardano
+https://www.youtube.com/watch?v=ThYByMLC0EI&list=PLNEK_Ejlx3x2T1lIR4XnDILKukj3rPapi&index=2&ab_channel=IOGAcademy
 
 - utxo's store value, and up until now in the lectures value has only been in the context of ada(lovelace)
 - if you want to create tokens other than lovelace, you must create them, or burn them 

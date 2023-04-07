@@ -1,3 +1,5 @@
+https://www.youtube.com/watch?v=3tcWCZV6L_w&list=PLNEK_Ejlx3x1-oF7NDy0MhXxG7k5O6ZOA&ab_channel=IOGAcademy
+
 When a transaction is submitted to a node that tries to spend a utxo owned by a script, the node executes the `validator` script and uses the result of the script to determind whether the utxo can be spent
 
 `datum`, `redeemer` at a low level are both of type `BuiltInData` in plutus

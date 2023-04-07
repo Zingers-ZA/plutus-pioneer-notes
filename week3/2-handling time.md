@@ -1,3 +1,4 @@
+https://www.youtube.com/watch?v=LPzwMqOnWvk&list=PLNEK_Ejlx3x2zXSjHRKLSc5Jn9vJFA3_O&index=2&ab_channel=IOGAcademy
 - validator script should never need to fail under normal circumstances
 - this is because the script can be validated under exactly the same circumstances off chain before submitting to the chain
 - meaning the wallet can always validate that a transaction is valid before submitting

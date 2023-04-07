@@ -1,4 +1,5 @@
 # NFT's
+https://www.youtube.com/watch?v=9kW-z_RuwEY&list=PLNEK_Ejlx3x2T1lIR4XnDILKukj3rPapi&index=5&ab_channel=IOGAcademy
 
 - how do you garauntee that a token can only be minted once? 
     - you only have context of the current transaction

@@ -1,4 +1,6 @@
 ## Example vesting contract: 
+https://www.youtube.com/watch?v=5D0O7q9UPJA&list=PLNEK_Ejlx3x2zXSjHRKLSc5Jn9vJFA3_O&index=3&ab_channel=IOGAcademy
+
 ```
 data VestingDatum = VestingDatum            <--- custom datum type
     { beneficiary :: PubKeyHash

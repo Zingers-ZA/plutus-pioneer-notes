@@ -1,4 +1,5 @@
 ## High level, Typed validators
+https://www.youtube.com/watch?v=GT8OjOzsOb4&list=PLNEK_Ejlx3x1-oF7NDy0MhXxG7k5O6ZOA&index=3&ab_channel=IOGAcademy
 
 - using `BuiltInData` is not optimal for a typed language because we are just lumping every arg into a format similar to json, meaning you lose context of the type
 

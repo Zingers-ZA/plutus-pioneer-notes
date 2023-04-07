@@ -1,3 +1,5 @@
+https://www.youtube.com/watch?v=dcoYrIyEI4o&list=PLNEK_Ejlx3x2zXSjHRKLSc5Jn9vJFA3_O&ab_channel=IOGAcademy
+
 - When a script executes it must be given context to be able to validate that a transaction can spend a utxo
 - the context in this case must be all of the input utxos and all of the output utxos
 

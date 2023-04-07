@@ -1,3 +1,5 @@
+https://www.youtube.com/watch?v=Rnyc5YXVXew&list=PLNEK_Ejlx3x2zXSjHRKLSc5Jn9vJFA3_O&index=7&ab_channel=IOGAcademy
+
 - usually a transaction that is trying to spend a utxo that is owned by a script address, must provide the script (serialized to cbor)
 - the node that then processes this transaction hashes the script provided and checks that the hash matches the hash attached to the utxo(that is to be spent)
 - it then executes the script
