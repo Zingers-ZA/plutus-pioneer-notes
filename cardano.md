@@ -96,11 +96,11 @@ This can be thought of in 2 ways
     - script can verify the datum provided matches the datum hash
     - requires the consumer to know the datum through some other means
     - cheapest for producer, hash is quite small, more expensive for consumers
-2. producer `attaches datum to utxo`, and provides `full datum in tx body` -> consuming transaction contains `actual datum in tx body`
+2. producer `attaches datum hash to utxo`, and provides `actual datum in tx body` -> consuming transaction contains `actual datum in tx body`
     - similar to previous, except now datum is recorded on blockchain by producer
     - possible to find datum using chain indexer
     - more expensive
-3. producer attaches a `full inline datum to the utxo itself` -> consumer provides `nothing`, only indicates it's inline
+3. producer attaches a `full inline datum to the utxo itself` -> consumer provides `nothing`, only indicates it expects an inline datum
     - consumer doesn't need to provide datum
     - cheaper for consumer
     - most common
