@@ -6,9 +6,9 @@
         - if pubkey, tx must be signed by priv key, if script, script will be executed and must return true
     - second part staking credentials
 - `datum` arbitrary data defined at the point of the producing transaction
-    - hash included by producer or
-    - actual datum included in tx body or
-    - datum attached to utxo(inline)
+    - hash attched to utxo by producer or
+    - hash attached to utxo and actual datum included in tx body or
+    - actual datum attached to utxo(inline) (common)
 - `redeemer` arbitrary data provided at the point of the spending transaction, 'unlocks output'
 - `script` validation logic that governs spending of utxos it owns
     - included in consuming transaction, or in reference script
