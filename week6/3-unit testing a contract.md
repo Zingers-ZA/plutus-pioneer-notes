@@ -1,6 +1,9 @@
 # unit testing a contract
 https://www.youtube.com/watch?v=vB8hyVq3HVo&list=PLNEK_Ejlx3x08fHgl_ZTlowVO8bjqITEh&index=3&ab_channel=IOGAcademy
 
+- `Plutus.model` is the testing library for cardano
+    - contains most functions to do mocking, transfering funds, creating users, etc.
+
 This is the contract we will be testing:
 ```
 newtype CustomDatum = MkCustomDatum { deadline :: POSIXTime }
