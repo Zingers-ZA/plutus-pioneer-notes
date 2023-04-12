@@ -4,18 +4,22 @@
 
 - lucid can be used with blockfrost, but also any provider that you can host yourself
 - can get the docs from at https://deno.land/x/lucid@0.9.8/mod.ts
+- importing
+    - `import * as L from "https://deno.land/x/lucid@0.9.8/mod.ts";`
+    - `import Lucid from "https://deno.land/x/lucid@0.9.8/mod.ts";`
 
-# connecting to a wallet
+# Connecting to a wallet
 
 - selecting a wallet in lucid loads the wallet into the global `lucid.wallet` property 
     - `selectWallet` used mainly on the browser(finds `window.cardano.<walletname>.enable`)
     - `selectWalletFromSeed` gets a wallet from a string of words(seed phrase format)
+    - `selectWalletFromPrivateKey` gets a wallet from a private key
 
-# addresses:
+# Addresses:
 
 - `lucid.wallet.address()` returns string address of currently loaded wallet
 
-# utxos:
+# Utxos:
 
 ```
 const vestingScript: SpendingValidator = {
@@ -33,34 +37,46 @@ await lucid.utxosAt(addr); // [UTxo]
 # 'Data':
 
 - `Lucid.Data` gives access to all serializable BuiltInData types
-    - `Data.String`
-    - `Data.BigInt` 
-    - `Data.String`
+    - `Data.Bytes()`
+    - `Data.Integer()` 
+    - `Data.Map()`
+    - `Data.void()` for haskell unit
     - etc.
+- `Data` makes working with cbor much easier
+    - `Data.to<type>(object, shape)` allows converting an object to cbor string, given it's shape and type
+    - `Data.from<type>(string, shape)` allows converting an cbor string to an object, given it's shape and type
 
-Can be used for datum/redeemer/etc:
+Must be used for datum/redeemer/etc.
 ```
-const VestingDatum = Data.Object({
-    beneficiary: Data.String,
-    deadline: Data.BigInt,
-})
-type VestingDatum = Data.Static<typeof VestingDatum>;
+const MyDatum = Data.Object({
+  name: Data.Bytes(),
+  age: Data.Integer(),
+  colors: Data.Array(Data.Bytes()),
+  description: Data.Nullable(Data.Bytes()),
+});
+type MyDatum = Data.Static<typeof MyDatum>;
 ```
-- before including into a utxo, you convert the Datum to a cbor encoded string of type datum:
+- this is only illustrating the shape of the datum
+- when you provide this in a transaction, you must convert strings to bytes:
 ```
-async function vestFunds(amount: bigint): Promise<TxHash> {
-    const dtm: Datum = Data.to<VestingDatum>(datum, VestingDatum)
-                      ^^^^^^^^
-                //datum conversion
-    const tx = await lucid
-        .newTx()
-        .payToContract(vestingAddress, { inline: dtm }, { lovelace: amount })
-        .complete()
-    const signedTx = await tx.sign().complete();
-    const txHash = await signedTx.submit()
-    return txHash;
-}
+  const datum: MyDatum = {
+    name: fromText("Lucid"),
+    age: 0n,
+    colors: [fromText("Blue"), fromText("Purple")],
+    description: null,
+  };
 ```
+submitting: 
+```
+const tx = await lucid                     type here     json      Data.Object
+  .newTx()                                      vvvv     vvv       vvv
+  .payToAddressWithData("addr_test...", Data.to<MyDatum>(datum, MyDatum), {
+    lovelace: 10000000n,
+  })
+  .complete();
+```
+#### helpers
+- 
 
 
 

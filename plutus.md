@@ -1,6 +1,5 @@
 # General plutus notes
 
-
 ### common imports 
 ```
 import           Plutus.V2.Ledger.Api      (
@@ -43,4 +42,43 @@ import           Plutus.Model            (Ada (Lovelace), DatumMode (HashDatum),
 
 -- util
 import           Utilities                 (wrapValidator, writeValidatorToFile) -- local file
+```
+
+### common LANGUAGE options
+```
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TemplateHaskell       #-}
+```
+
+- `{-# LANGUAGE DataKinds             #-}` required for the `$$(compile [|| ... ||])` code 
+- `{-# LANGUAGE MultiParamTypeClasses #-}` ?
+- `{-# LANGUAGE NoImplicitPrelude     #-}` ?
+- `{-# LANGUAGE OverloadedStrings     #-}` required to work with string literals
+- `{-# LANGUAGE ScopedTypeVariables   #-}` ?
+- `{-# LANGUAGE TemplateHaskell       #-}` required for `[|| ... ||]` code
+
+### common INLINABLE flags
+
+```
+make inlinable to use in mkWrappedValidator
+      vvvvv
+{-# INLINABLE mkValidator #-}
+mkValidator :: DatumSwap -> () -> ScriptContext -> Bool
+mkValidator ds _ ctx = True
+
+make inlinable to use in validator
+            vvvvvv
+{-# INLINABLE  mkWrappedValidator #-}
+mkWrappedValidator :: BuiltinData -> BuiltinData -> BuiltinData -> ()
+mkWrappedValidator = wrapValidator mkValidator
+
+
+validator :: Validator
+validator = mkValidatorScript $$(compile [|| mkWrappedValidator ||])
+                                                ^^^^^
+                                     inlinable mkWrappedValidator
 ```
