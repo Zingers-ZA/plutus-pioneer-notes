@@ -18,8 +18,15 @@ import           Plutus.V2.Ledger.Api      (
                                             mkMintingPolicyScript
                                             )
 
-import           PlutusTx                  (applyCode, compile, liftCode,
-                                            makeLift)
+import           PlutusTx                  (
+                                            applyCode, 
+                                            compile, 
+                                            liftCode,
+                                            makeLift, 
+                                            BuiltinData, 
+                                            compile, 
+                                            unstableMakeIsData
+                                            )
 
 import           Plutus.V2.Ledger.Contexts (txSignedBy)
 
@@ -31,14 +38,14 @@ import           Prelude                   (IO)
 import           Plutus.V1.Ledger.Interval (contains)
 
 -- testing
-import           Plutus.Model            (Ada (Lovelace), DatumMode (HashDatum),
-                                          Run, Tx,
-                                          TypedValidator (TypedValidator),
-                                          UserSpend, ada, adaValue,
-                                          defaultBabbage, initMock, mustFail,
-                                          newUser, payToKey, payToScript,
-                                          runMock, spend, spendScript, submitTx,
-                                          toV2, userSpend, utxoAt, valueAt, waitUntil, currentTimeRad, validateIn)
+import           Plutus.Model              (Ada (Lovelace), DatumMode (HashDatum),
+                                           Run, Tx,
+                                           TypedValidator (TypedValidator),
+                                           UserSpend, ada, adaValue,
+                                           defaultBabbage, initMock, mustFail,
+                                           newUser, payToKey, payToScript,
+                                           runMock, spend, spendScript, submitTx,
+                                           toV2, userSpend, utxoAt, valueAt, waitUntil, currentTimeRad, validateIn)
 
 -- util
 import           Utilities                 (wrapValidator, writeValidatorToFile) -- local file
@@ -52,6 +59,7 @@ import           Utilities                 (wrapValidator, writeValidatorToFile)
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE NumericUnderscores #-}
 ```
 
 - `{-# LANGUAGE DataKinds             #-}` required for the `$$(compile [|| ... ||])` code 
@@ -60,6 +68,7 @@ import           Utilities                 (wrapValidator, writeValidatorToFile)
 - `{-# LANGUAGE OverloadedStrings     #-}` required to work with string literals
 - `{-# LANGUAGE ScopedTypeVariables   #-}` ?
 - `{-# LANGUAGE TemplateHaskell       #-}` required for `[|| ... ||]` code
+- `{-# LANGUAGE NumericUnderscores #-}` allows using numbers like `10_000_000`
 
 ### common INLINABLE flags
 

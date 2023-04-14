@@ -15,7 +15,7 @@ mk42Validator _ r _ = r == 42
 ### new compliation required
 The above code causes the usual validator compiler to break
 ```
-validator :: PlutusV2.Validator
+    validator :: PlutusV2.Validator
 validator = PlutusV2.mkValidatorScript $$(PlutusTx.compile [|| mkGiftValidator ||])
                                                                 ^^^^^^^^^^^^^^
 ```
