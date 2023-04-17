@@ -18,6 +18,8 @@
 # Addresses:
 
 - `lucid.wallet.address()` returns string address of currently loaded wallet
+- easiest way to get `current wallet pubkeyhash`:
+    - `paymentCredentialOf(await lucid.wallet.address()).hash`
 
 # Utxos:
 
