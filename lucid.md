@@ -195,6 +195,35 @@ const signedPolicy: MintingPolicy = {
 - this applies a given set of params to a partially compiled script
     - partially compiled because this must be compiled without the params, so they can be applied later
 
+#### applying an object as script parameter from lucid:
+```
+              must be tuple for params
+                        vvv 
+const ParamShape = Data.Tuple(
+    [Data.Object({
+        owner: Data.Bytes(),
+        tokenName: Data.Bytes()
+    })]
+      ^^
+    typle requires array
+)
+type TParamShape = Data.Static<typeof ParamShape>;
+
+const pkh: PublicKey = paymentCredentialOf(await lucid.wallet.address()).hash;
+
+const Params = {
+    owner: pkh,
+    tokenName: fromText("ZingCoinParameterized")
+}
+
+const policy: MintingPolicy = {
+    "type": "PlutusV2",
+    "script": applyParamsToScript<TParamShape>(
+        "5909...00011",
+        [Params],
+        ParamShape)
+}
+```
 
 # Minting
 
