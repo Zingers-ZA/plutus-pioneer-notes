@@ -1,5 +1,5 @@
 # serializing helpers 
-```
+```haskell
 {-# LANGUAGE LambdaCase #-}
 
 module Utilities.Serialise

@@ -1,6 +1,6 @@
 # wrappers for typed validators
 - note, would need to be adapted for parameterized scripts
-```
+```haskell
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module Utilities.PlutusTx

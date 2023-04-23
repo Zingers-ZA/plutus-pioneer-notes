@@ -1,7 +1,7 @@
 # Unit testing with Lucid(and quickcheck)
 
 ## usefull snippets:
-```
+```typescript
 const emulator = new L.Emulator([{ address: address1, assets: { lovelace: 10000000000n } }, { address: address2, assets: { lovelace: 10000000000n}}]);
 const lucid = await L.Lucid.new(emulator);
 ```
@@ -20,7 +20,7 @@ const lucid = await L.Lucid.new(emulator);
 #### validator that will be tested:
 - `datum` contains deadline which must pass before utxo can be consumed
 - `redeemer` must be >= 0
-```
+```haskell
 newtype CustomDatum = MkCustomDatum { deadline :: POSIXTime }
 unstableMakeIsData ''CustomDatum
 
@@ -37,7 +37,7 @@ mkValidator (MkCustomDatum d) r ctx = traceIfFalse "expected a negative redeemer
 
 #### some boilerplate:
 - sets up script, script address, datum and redeemer types
-```
+```typescript
 const negativeRTimedValidator: L.SpendingValidator = {
   type: "PlutusV2",
   script: "590A...456BF1",
@@ -54,14 +54,14 @@ type NegativeRTimedRedeemer = L.Data.Static<typeof NegativeRTimedRedeemer>;
 
 #### test helper functions: 
 
-```
+```typescript
 // the function that given the context of lucid, the wallet,the datum and sends 10 ada to the script address.
 async function sendToScript(
     lucid: L.Lucid,
-    userPrivKey: L.PrivateKey,                 <- using private key because only emulating
+    userPrivKey: L.PrivateKey,                 // using private key because only emulating
     dtm: NegativeRTimedDatum
   ): Promise<L.TxHash> {
-  lucid.selectWalletFromPrivateKey(userPrivKey);                <-- select wallet
+  lucid.selectWalletFromPrivateKey(userPrivKey);                // select wallet
   const tx = await lucid                             inline datum           
     .newTx()                                        vvvvvvvvvvvvvvv
     .payToContract(negativeRTimedAddr, { inline: L.Data.to<NegativeRTimedDatum>(dtm,NegativeRTimedDatum) }, { lovelace: 10000000n })
@@ -73,7 +73,7 @@ async function sendToScript(
 ```
 
 
-```
+```typescript
 // the function that given the context of lucid and a negative redeemer, grabs funds from the script address.
 async function grabFunds(
     lucid: L.Lucid,
@@ -81,19 +81,19 @@ async function grabFunds(
     userPrivKey: L.PrivateKey,
     dtm: NegativeRTimedDatum,
     r: NegativeRTimedRedeemer
-  ): Promise<L.TxHash> {                                create redeemer
-  lucid.selectWalletFromPrivateKey(userPrivKey);            vvvv
+  ): Promise<L.TxHash> {                               // create redeemer
+  lucid.selectWalletFromPrivateKey(userPrivKey);        // vvvv
   const rdm: L.Redeemer = L.Data.to<NegativeRTimedRedeemer>(r,NegativeRTimedRedeemer);
-  const utxoAtScript: L.UTxO[] = await lucid.utxosAt(negativeRTimedAddr);                   <<-- get utxos at the script address
+  const utxoAtScript: L.UTxO[] = await lucid.utxosAt(negativeRTimedAddr);                   // get utxos at the script address
   const ourUTxO: L.UTxO[] = utxoAtScript.filter((utxo) => utxo.datum == L.Data.to<NegativeRTimedDatum>(dtm,NegativeRTimedDatum));
-                                    ^^^^^^^
-                                filter for utxos that use our datum
+//                                  ^^^^^^^
+//                              filter for utxos that use our datum
   if (ourUTxO && ourUTxO.length > 0) {
       const tx = await lucid
           .newTx()
-          .collectFrom(ourUTxO, rdm)                 <- collect from all found utxos with our datum
+          .collectFrom(ourUTxO, rdm)                 // collect from all found utxos with our datum
           .attachSpendingValidator(negativeRTimedValidator)
-          .validFrom(emulator.now())                 <- use emulator.now() instead of date.now()
+          .validFrom(emulator.now())                 // use emulator.now() instead of date.now()
           .complete();
 
       const signedTx = await tx.sign().complete();
@@ -107,12 +107,12 @@ async function grabFunds(
 - `emulator.now()` retrieves the current POSIX time in the emulator
 
 #### testing function
-```
+```typescript
 async function runTest(dtm: NegativeRTimedDatum, r: NegativeRTimedRedeemer, n: number) {
   const user1: L.PrivateKey = L.generatePrivateKey();
   const address1: string = await (await L.Lucid.new(undefined, "Custom")).selectWalletFromPrivateKey(user1).wallet.address();
-                                            ^^^^^^^^^
-                                        lucid not intiallized fully because we only need it to get a wallet address
+//                                          ^^^^^^^^^
+//                                      lucid not intiallized fully because we only need it to get a wallet address
 
   const user2: L.PrivateKey = L.generatePrivateKey();
   const address2: string = await (await L.Lucid.new(undefined, "Custom")).selectWalletFromPrivateKey(user2).wallet.address();
@@ -120,8 +120,8 @@ async function runTest(dtm: NegativeRTimedDatum, r: NegativeRTimedRedeemer, n: n
   // Setup the emulator and give our testing wallet 10000 ada. These funds get added to the genesis block.
   const emulator = new L.Emulator([{ address: address1, assets: { lovelace: 10000000000n } }, { address: address2, assets: { lovelace: 10000000000n}}]);
   const lucid = await L.Lucid.new(emulator);
-                         ^^^^^^
-                    lucid initalized here
+//                       ^^^^^^
+//                  lucid initalized here
   await sendToScript(lucid,user1,dtm);
 
   emulator.awaitSlot(n);
@@ -141,7 +141,7 @@ await runTest({deadline:BigInt(Date.now()+20000*5+1000)},-42n,5*20);
     3. submits a consuming transaction with redeemer `r` given in the params
 
 #### Units tests
-```
+```typescript
 function testSucceed(
   str: string, // the string to display of the test
   r: bigint,   // the redeemer number
@@ -191,7 +191,7 @@ testFails("UT: User 1 locks and user 2 takes with R = 42 before dealine; fails",
 
 #### describing how fast check should generate test values
 
-```
+```typescript
 // set up a fixed deadline at slot 100
 const dl: number = 100*1000;
 // create only random 256 bit negative big integers for r.
@@ -205,12 +205,12 @@ const beforeDeadlineWaits = fc.integer().filter((n: number) => n < dl);
 - `fastCheck.integer()` generates random integers either positive or negative
 
 #### Units tests
-```
+```typescript
 Deno.test("PT: Negative redeemer after deadline always succeeds", () => {
-            what fastcheck uses to get values
-                  vvvv                                passes values to function
-  fc.assert(fc.asyncProperty(                                vvvvvvvvv
-    negativeBigIntArbitrary, afterDeadlineWaits, async (r: bigint,n: number) => {  <<-- use our fastCheck value generators here
+//          what fastcheck uses to get values
+//              vvvv                                passes values to function
+  fc.assert(fc.asyncProperty(                            //  vvvvvvvvv
+    negativeBigIntArbitrary, afterDeadlineWaits, async (r: bigint,n: number) => {  // use our fastCheck value generators here
       try {
         await runTest({deadline:BigInt(Date.now()+dl)},r,n);
       } catch (error) {
@@ -218,7 +218,7 @@ Deno.test("PT: Negative redeemer after deadline always succeeds", () => {
         throw error
       };
     }
-  ),{numRuns: 100});                                                              <-- number of runs for fastCheck
+  ),{numRuns: 100});                                                              // number of runs for fastCheck
 });
 
 Deno.test("PT: Positive redeemer after deadline always fails", () => {

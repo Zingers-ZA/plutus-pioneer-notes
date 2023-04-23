@@ -10,7 +10,7 @@ https://www.youtube.com/watch?v=8tWzG0ML6Z4&list=PLNEK_Ejlx3x08fHgl_ZTlowVO8bjqI
     2. a 'blockchain'(list of Utxo's)
     3. an initial blockchain state
 
-```
+```haskell
 -- Mock UTxO type
 data UTxO = UTxO { owner :: String , value :: Integer }
     deriving (Show, Eq)
@@ -27,7 +27,7 @@ initialMockS = Mock [ UTxO "Alice" 1000 ]
 - the below function takes in some 'addresses', and values(utxos) to send, as well as a State of the 'blockchain'
     - it returns the state after the sending has occured
 
-```
+```haskell
 sendValue :: String -> Integer -> String -> Mock -> (Bool, Mock)
 sendValue from amount to mockS =
     let senderUtxos = filter ((== from) . owner) (utxos mockS)
@@ -42,7 +42,7 @@ sendValue from amount to mockS =
 
 - now we'll define a function that uses our `sendvalue` function
 - the idea here is to do some testing
-```
+```haskell
 multipleTx :: (Bool, Mock)
 multipleTx =
     let (isOk,  mockS1) = sendValue "Alice" 100 "Bob"   initialMockS  <-- we are having to pass in the state to each call
@@ -55,7 +55,7 @@ multipleTx =
 ## Example using the State monad
 
 - once again we'll create our types:
-```
+```haskell
 -- Mock UTxO type
 data UTxO = UTxO { owner :: String , value :: Integer }
     deriving (Show, Eq)
@@ -69,7 +69,7 @@ initialMockS :: Mock
 initialMockS = Mock [ UTxO "Alice" 1000 ]
 ```
 - next we will re-write our `sendValue` function to use the State monad
-```
+```haskell
 -- function signature for reference
 -- newtype State s a = State { runState :: s -> (a, s) }
                                ^^^ --------------------------important, exposes get, put, state
@@ -94,7 +94,7 @@ sendValue' from amount to = do
 - our function is now updating and managing some state on it own, by retrieving the current state at the start with `get`, and then updating it at the end with `put`
 - `State` takes in an execution step(`s`) and an initial state(`a`), and uses `runState` to execute the execution step and return the updated state
 - now update the multipleTx function which is actually running our tests:
-```
+```haskell
 multipleTx' :: (Bool, Mock)
 multipleTx' = runState (do                      <-- 
     isOk  <- sendValue' "Alice" 100 "Bob"       <-- no more need to pass in state manually

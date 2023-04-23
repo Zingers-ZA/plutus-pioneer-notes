@@ -14,7 +14,7 @@ https://www.youtube.com/watch?v=g_VoKPK-tk0&list=PLNEK_Ejlx3x2T1lIR4XnDILKukj3rP
 
 ## script context for minting
 - recall the structure of ScriptContext
-```
+```haskell
 ScriptContext 
     scriptContextTxInfo :: TxInfo
     scriptContextPurpose :: ScriptPurpose
@@ -30,14 +30,14 @@ Previous examples have mainly used a script purpose of 'spending', but minting s
 
 #### TxInfo
 
-```
+```haskell
 txInfo
   txInfoInputs :: [TxInInfo]
   txInfoOutputs :: [TxOut]
-  ...
-  txInfoMint :: Value         <--  read about Value in '1-values.md'
-  ^^^^^^^^^^^^^^^
- info about minting
+  -- ...
+  txInfoMint :: Value    --  read about Value in '1-values.md'
+-- ^^^^^^^^^^^^^^^
+-- info about minting
 
 ```
 
@@ -49,9 +49,9 @@ txInfo
 - minting 
 
 # example minting policy
-```
-                only 2 params
-               vvv    vvvvvvv
+```haskell
+--                only 2 params
+--               vvv    vvvvvvv
 mkFreePolicy :: () -> ScriptContext -> Bool
 mkFreePolicy () _ = True
 -- always mints
@@ -72,26 +72,26 @@ freePolicy = mkMintingPolicyScript $$(PlutusTx.compile [|| mkWrappedFreePolicy |
 - Lucid uses a type called `Unit` to represent `AssetClass`
 - `fromText` is usefull to convert ascii(human) text to hex
 
-```
+```typescript
 const freePolicy: MintingPolicy = {
     type: "PlutusV2",
     script: "5830582e010000323222320053333573466e1cd55ce9baa0024800080148c98c8014cd5ce249035054310000500349848005"
 };
 
 const policyId: PolicyId = lucid.utils.mintingPolicyToId(freePolicy);
-                                        ^^^^^
-                       gets policyId(script hash) from minting policy
+//                                      ^^^^^
+//                     gets policyId(script hash) from minting policy
 
 const unit: Unit = policyId + fromText("PPP Free");
-           ^^^             ^^^^^^
-  create 'assetclass'    CurrencySymbol + tokenName
+//          ^^^             ^^^^^^
+// create 'assetclass'    CurrencySymbol + tokenName
 
 const tx = await lucid
     .newTx()
-    .mintAssets({[unit]: 10000}, Data.void())         <-- minting assets: contains Value, and redeemer
-                  ^^      ^^         ^^
-            assetClass   amount      redeemer
-    .attachMintingPolicy(freePolicy)                  <-- attach actual script to tx
+    .mintAssets({[unit]: 10000}, Data.void())         // minting assets: contains Value, and redeemer
+//                ^^      ^^         ^^
+//          assetClass   amount      redeemer
+    .attachMintingPolicy(freePolicy)                  // attach actual script to tx
     .complete();
 
 const signedTx = await tx.sign().complete();

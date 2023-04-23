@@ -1,13 +1,13 @@
 ## Example vesting contract: 
 https://www.youtube.com/watch?v=5D0O7q9UPJA&list=PLNEK_Ejlx3x2zXSjHRKLSc5Jn9vJFA3_O&index=3&ab_channel=IOGAcademy
 
-```
-data VestingDatum = VestingDatum            <--- custom datum type
+```haskell
+data VestingDatum = VestingDatum            -- custom datum type
     { beneficiary :: PubKeyHash
     , deadline    :: POSIXTime
     }
 
-unstableMakeIsData ''VestingDatum           <-- needed to allow BuiltInData instance
+unstableMakeIsData ''VestingDatum           -- needed to allow BuiltInData instance
 
 {-# INLINABLE mkVestingValidator #-}
 mkVestingValidator :: VestingDatum -> () -> ScriptContext -> Bool
@@ -15,7 +15,7 @@ mkVestingValidator dat () ctx = traceIfFalse "beneficiary's signature missing" s
                                 traceIfFalse "deadline not reached" deadlineReached
   where
     info :: TxInfo
-    info = scriptContextTxInfo ctx            < -- using the ScriptContext to get TxInfo
+    info = scriptContextTxInfo ctx            -- using the ScriptContext to get TxInfo
 
     signedByBeneficiary :: Bool
     signedByBeneficiary = txSignedBy info $ beneficiary dat

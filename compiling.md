@@ -4,7 +4,7 @@
 - untyped scripts are scripts which take in parameters(datum, redeemer) that are of type `BuiltInData`
     - lowest level of param, easy to compile
 - follow pattern of `BuiltInData -> BuiltInData -> BuiltInData -> ()`
-```
+```haskell
 mkGiftValidator :: BuiltInData -> BuiltInData -> BuiltInData -> ()
 mkGiftValidator _ _ _ = ()
 
@@ -16,16 +16,16 @@ validator = PlutusV2.mkValidatorScript $$(PlutusTx.compile [|| mkGiftValidator |
 
 - typed scripts are scripts that have params(datum, redeemer) which can be arbitrary types
 - wrapping is required the turn these scripts to scripts of type `BuiltInData -> BuiltInData -> BuiltInData -> ()`
-```
-                Datum  Redeemer        ScriptContext
+```haskell
+--              Datum  Redeemer        ScriptContext
 mk42Validator :: () -> Integer -> PlutusV2.ScriptContext -> Bool
 mk42Validator _ r _ = traceIfFalse "expected 42" $ r == 42
 {-# INLINABLE mk42Validator #-}
 
 validator :: PlutusV2.Validator
 validator = PlutusV2.mkValidatorScript $$(PlutusTx.compile [|| wrapValidator mk42Validator ||])
-                                                                 ^^^^^^
-                                                 this is a helper function to do wrapping
+--                                                               ^^^^^^
+--                                               this is a helper function to do wrapping
 ```
 >wrapValidator sneak peek
 >```
@@ -41,7 +41,7 @@ validator = PlutusV2.mkValidatorScript $$(PlutusTx.compile [|| wrapValidator mk4
 >```
 
 ### full example:
-```
+```haskell
 data VestingDatum = VestingDatum
     { beneficiary :: PubKeyHash
     , deadline    :: POSIXTime
@@ -75,7 +75,7 @@ saveVal = writeValidatorToFile "./assets/vesting.plutus" validator
 - also presents a challenge because the parameter value is not known at compile time
 
 Example:
-```
+```haskell
 data VestingParams = VestingParams
     { beneficiary :: PubKeyHash, deadline :: POSIXTime}
 
@@ -85,24 +85,24 @@ mkParameterizedVestingValidator params () () ctx = True
 ```
 
 #### Step 1 - update the wrapper:
-```
+```haskell
 {-# INLINABLE  mkWrappedParameterizedVestingValidator #-}
-                                        note the new param
-                                           vvv
+--                                      note the new param
+--                                          vvv
 mkWrappedParameterizedVestingValidator :: VestingParams -> BuiltinData -> BuiltinData -> BuiltinData -> ()
 mkWrappedParameterizedVestingValidator = wrapValidator . mkParameterizedVestingValidator
-                                                       ^^
-                                           dot syntax required here
+--                                                     ^^
+--                                         dot syntax required here
 ```
 
 #### Step 2 - update the validator 
-```
-                new param
-                  vvv
+```haskell
+--                new param
+--                  vvv
 validator :: VestingParams -> Validator
 validator p = mkValidatorScript $$(compile [|| mkWrappedParameterizedVestingValidator p ||])
-         ^^                                                                           ^^
-      add p so types are correct                                                add p so types are correct
+--         ^^                                                                           ^^
+--      add p so types are correct                                                add p so types are correct
 ```
 
 #### problem !:
@@ -122,30 +122,30 @@ note: `Lift` can only be applied to data types, not function type
 
 #### step 1
 Turn our VestingParams object into a Lift
-```
+```haskell
 data VestingParams = VestingParams
     { beneficiary :: PubKeyHash
     , deadline    :: POSIXTime
     }
 
 makeLift ''VestingParams
- ^^^^^^^^^^^^^^^^
+-- ^^^^^^^^^^^^^^^^
 ```
 
 #### step 2
 Update our validator to apply the lift to the validator using `applyCode`
-```
+```haskell
 validator :: VestingParams -> Validator
 validator params = mkValidatorScript ($$(compile [|| mkWrappedParameterizedVestingValidator ||]) `applyCode` liftCode params)
-                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^
-                                                              applying the compiled script to the params liftcode that is compiled at runtime
+--                                                                                                ^^^^^^^^^^^^^^^^^^^^^^
+--                                                            applying the compiled script to the params liftcode that is compiled at runtime
 ```
 
 #### Notes: 
 - can have multiple params, in which case you need to chain several `applyCodes` to apply the params one after the other, and would need to lift those params as well
 
 ### Full example:
-```
+```haskell
 data VestingParams = VestingParams
     { beneficiary :: PubKeyHash, deadline :: POSIXTime }
 makeLift ''VestingParams
@@ -179,9 +179,9 @@ saveVal = writeValidatorToFile "./assets/parameterized-vesting.plutus" . validat
 #### Generating the script: 
 >- this is a minting policy but the same applies to spend validators
  >   - note that minting policies only have 2 normal params(ScriptContext and Redeemer)
-```
-                   param
-                    vvvv
+```haskell
+--                   param
+--                    vvvv
 mkSignedPolicy :: PubKeyHash -> () -> ScriptContext -> Bool
 mkSignedPolicy pkh () ctx = traceIfFalse "missing signature" $ txSignedBy (scriptContextTxInfo ctx) pkh
 
@@ -203,7 +203,7 @@ saveSignedCode = writeCodeToFile "assets/signed.plutus" signedCode
 - The above is compiling a script which accepts a parameter that can compile to the BuiltInData type
 
 #### Applying the params in lucid
-```
+```haskell
 const pkh: string = getAddressDetails(addr).paymentCredential?.hash || "";
 
 const Params = Data.Tuple([Data.String]);

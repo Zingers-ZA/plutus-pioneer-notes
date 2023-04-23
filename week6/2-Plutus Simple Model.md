@@ -2,7 +2,7 @@
 https://www.youtube.com/watch?v=Sft02LeXA_U&list=PLNEK_Ejlx3x08fHgl_ZTlowVO8bjqITEh&index=2&ab_channel=IOGAcademy
 
 We're going to define a main function to do some testing
-```
+```haskell
 main :: IO ()
 main = defaultMain $ do 
         testGroup
@@ -30,23 +30,23 @@ in the above:
 
 first we need to define a helper function
 - this just sets up some users to use for transactions
-```
+```haskell
 setUpUsers :: Run [PubKeyHash]
 setUpUsers = replicateM 3 $ newUser $ ada (Lovelace 1000)
-                 ^^           ^^
-            do 3 times        function fro   m Plutus.model.contract  
+--               ^^           ^^
+--          do 3 times        function fro   m Plutus.model.contract  
 ```
 - this function creates 3 new users
 - `newUser` is a plutus function that takes in a value and returns a 'user'(pub key hash) with a utxo with that amount of funds.
     - it gets these funds from the 'admin' user that was created by `testNoError` when it was initially setup using (ada 10_000_000) and defaultBabbage
 
 #### simpleSpend test
-```
+```haskell
 simpleSpend :: Run Bool
 simpleSpend = do 
-    users <- setupUsers                <-- creates the 3 users from setupUsers
+    users <- setupUsers                -- creates the 3 users from setupUsers
     let [u1, u2, u3] = users
-    sendValue u1 (adaValue 100) u2     <-- sending
+    sendValue u1 (adaValue 100) u2     -- sending
     sendValue u2 (adaValue 100) u3
     isOk <- noErrors
     vals <- mapM valueAt users
@@ -64,13 +64,13 @@ simpleSpend = do
 
 #### notEnoughFunds test
 
-```
+```haskell
 notEnoughFunds :: Run Bool
 notEnoughFunds = do
     users <- setupUsers
     let [u1, u2, u3] = userse
-    sendValue u1 (adaValue 10000) u2   <-- sending too many tokens(user doesn't have funds)
-    noErrors                           <-- running this should retrieve the error that will have occurred from that preceding transaction 
+    sendValue u1 (adaValue 10000) u2   -- sending too many tokens(user doesn't have funds)
+    noErrors                           -- running this should retrieve the error that will have occurred from that preceding transaction 
 ```
 - because `noErrors` is a Plutus.model.contract function and used in tests, it already returns a `Run Bool`, and since the result of the last line in a `do` block is returned by default, there is no need to write a return call for this function
     - it would have looked like 

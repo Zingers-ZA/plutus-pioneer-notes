@@ -9,15 +9,15 @@ https://www.youtube.com/watch?v=Faru8_Br2Xg&list=PLNEK_Ejlx3x2T1lIR4XnDILKukj3rP
 #### Generating the script: 
 >- this is a minting policy but the same applies to spend validators
  >   - note that minting policies only take in ScriptContext and Redeemer usually(no datum)
-```
-                   param
-                    vvvv
+```haskell
+//                   param
+//                    vvvv
 mkSignedPolicy :: PubKeyHash -> () -> ScriptContext -> Bool
 mkSignedPolicy pkh () ctx = traceIfFalse "missing signature" $ txSignedBy (scriptContextTxInfo ctx) pkh
 ```
 
 To generate a script that allows lucid to apply the params at a later stage, we will use the wrapper and validator create functions like so:  
-```
+```haskell
 mkWrappedPolicy :: BuiltinData -> BuiltinData -> BuiltinData -> ()
 mkWrappedPolicy pkh = wrapPolicy (mkSignedPolicy $ PlutusTx.unsafeFromBuiltinData pkh)
 
@@ -46,7 +46,7 @@ saveSignedCode = writeCodeToFile "assets/signed.plutus" signedCode
     - effectively a compiled script to accept a parameter that compiles to BuiltInData
 
 #### Applying the params in lucid
-```
+```typescript
 const pkh: string = getAddressDetails(addr).paymentCredential?.hash || "";
 
 const Params = Data.Tuple([Data.String]);

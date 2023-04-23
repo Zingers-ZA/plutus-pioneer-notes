@@ -6,11 +6,11 @@ https://www.youtube.com/watch?v=ThYByMLC0EI&list=PLNEK_Ejlx3x2T1lIR4XnDILKukj3rP
 
 
 ### Value type:
-```
+```haskell
 Value 
     getValue :: Map CurrencySymbol (Map TokenName Integer)
-                        ^^^              ^^^        ^^^
-                minting script hash    HoskyToken   150
+--                      ^^^              ^^^        ^^^
+--              minting script hash    HoskyToken   150
 ```
 - token on cardano is defined by a `CurrencySymbol` and a `Name`
 - CurrencySymbol and TokenName are both `BuiltInByteString`
@@ -23,19 +23,19 @@ Value
 - Because ADA is the default value, the CurrencySymbol and Token Name are both '' for it
 
 helper function called `assetClassValue`
-```
+```haskell
 assetClassValue :: AssetClass -> Integer -> Value
 -- returns value containing an assetClass and amount of that assetClass
 -- usage:
 
 let ada = assetClass adaSymbol adaToken
-assetClassValue ada 10000000
 
---> Value (Map [(, Map [("", 10000000)])])
+-- assetClassValue ada 10000000
+-- Value (Map [(, Map [("", 10000000)])])
 ```
 
 helper function called `assetClassValueOf`
-```
+```haskell
 assetClassValueOf :: Value -> AssetClass -> Integer
 -- returns amount of tokens of a given assetclass are within a 'Value'
 -- usage:
@@ -60,10 +60,10 @@ assetClassValueOf v ada
         in List: []
     - mconcat 
 the idea is that it works with multiple types, eg:
-```
+```haskell
 "Plutus" <> "Pioneer" :: String
-        ^^^^
-      mappend
+--      ^^^^
+--    mappend
 ```
 
 ## combining Values
@@ -71,14 +71,14 @@ the idea is that it works with multiple types, eg:
 - Since value implements `monoid`, there are mappend, mempty and mconcat operations present on it.
 - means that if you want add 2 values, you can use `<>`
 eg:
-```
+```haskell
 let myToken = assetClassValue (AssetClass "fd23eab2" "myToken" ) 100
 let yourToken = assetClassValue (AssetClass "cfb2eab2" "yourToken" ) 200
 
 let v = myToken <> yourToken
-                ^^^
-            adds here
--- > Value ( Map [ (fd23eab2, Map[("MyToken") ]), (cfb2eab2, Map[ ("yourToken", 200) ]) ])
+--              ^^^
+--          adds here
+--  Value ( Map [ (fd23eab2, Map[("MyToken") ]), (cfb2eab2, Map[ ("yourToken", 200) ]) ])
 ```
 - `PlutusTx` library has a monoid which has a `gsub` operation
     - allows subtracting an amount of an assetClass from a `Value`

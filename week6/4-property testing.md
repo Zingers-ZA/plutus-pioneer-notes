@@ -7,7 +7,7 @@ https://www.youtube.com/watch?v=pF8HpKmaQi4&list=PLNEK_Ejlx3x08fHgl_ZTlowVO8bjqI
     - quickCheck is not specific to plutus, it's just a haskell library
 
 #### setting up the main test, with test cases
-```
+```haskell
 main :: IO ()
 main = defaultMain $ do
     testGroup
@@ -21,7 +21,7 @@ main = defaultMain $ do
 
 #### Helper functions :
 
-```
+```haskell
 -- | Make Run an instance of Testable so we can use it with QuickCheck
 instance Testable a => Testable (Run a) where
   property rp = let (a,_) = runMock rp $ initMock defaultBabbage (adaValue 10_000_000) in property a
@@ -38,29 +38,29 @@ instance Arbitrary POSIXTime where
     - `choose` is used for this
 
 #### Testing properties
-```
+```haskell
 -- All redeemers fail before deadline 
 prop_Before_Fails :: POSIXTime -> Integer -> Property
 prop_Before_Fails d r = (d > 1001) ==> runChecks False d r
-                         ^^^^^^
-                    setting the constraints for deadline
+--                       ^^^^^^
+--                  setting the constraints for deadline
 
 -- Positive redeemer always fail after deadline
 prop_PositiveAfter_Fails :: POSIXTime -> Integer -> Property
 prop_PositiveAfter_Fails d r = (r > 0 && d < 999) ==> runChecks False d r
-                                                        ^^
-                                                    function to do checking(defined below)
+--                                                      ^^
+--                                                  function to do checking(defined below)
 
 -- Negative redeemers always succeed after deadline
 prop_NegativeAfter_Succeeds :: POSIXTime -> Integer -> Property
 prop_NegativeAfter_Succeeds d r = (r < 0 && d < 999) ==> runChecks True d r
-                                                                    ^^^^
-                                                                params to test(False means should fail as per our own logic, see below)
+--                                                                  ^^^^
+--                                                              params to test(False means should fail as per our own logic, see below)
 ```
 - these are the 3 tests which are used in our `main` function
 
 #### runChecks function
-```
+```haskell
 -- | Check that the expected and real balances match after using the validator with different redeemers
 runChecks :: Bool -> POSIXTime -> Integer -> Property
 runChecks shouldConsume deadline redeemer = 
@@ -80,7 +80,7 @@ runChecks shouldConsume deadline redeemer =
 
 This function is simulating the transactions that are taking place in our test. Very similar to the one described in (3-Unit testing a contract.md)
 
-```
+```haskell
 -- Function to test if both creating an consuming script UTxOs works properly
 testValues :: Bool -> POSIXTime -> Integer -> Run Bool
 testValues shouldConsume datum redeemer = do
@@ -107,7 +107,7 @@ testValues shouldConsume datum redeemer = do
 
 # full test case for replication:
 
-```
+```haskell
 {-# LANGUAGE DataKinds          #-}
 {-# LANGUAGE FlexibleInstances  #-}
 {-# LANGUAGE NoImplicitPrelude  #-}

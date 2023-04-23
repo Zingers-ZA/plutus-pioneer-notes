@@ -5,7 +5,7 @@ https://www.youtube.com/watch?v=vB8hyVq3HVo&list=PLNEK_Ejlx3x08fHgl_ZTlowVO8bjqI
     - contains most functions to do mocking, transfering funds, creating users, etc.
 
 This is the contract we will be testing:
-```
+```haskell
 newtype CustomDatum = MkCustomDatum { deadline :: POSIXTime }
 unstableMakeIsData ''CustomDatum
 
@@ -23,33 +23,33 @@ mkValidator (MkCustomDatum d) r ctx = traceIfFalse "expected a negative redeemer
 - it just checkes that a redeemer is negative, and that the unlocking tx is submitted after the deadline has passed
 
 #### create some helped functions, we'll use later:
-```
+```haskell
 waitBeforeConsumingTx :: POSIXTime
-waitBeforeConsumingTx = 1000      <- time to wait in our example
+waitBeforeConsumingTx = 1000      -- time to wait in our example
 
 setupUsers :: Run [PubKeyHash]
-setupUsers = replicateM 2 $ newUser $ ada (Lovelace 1000)  <- users to use in our example
+setupUsers = replicateM 2 $ newUser $ ada (Lovelace 1000)  -- users to use in our example
 
 valScript :: TypedValidator datum redeemer
-valScript = TypedValidator $ toV2 OnChain.validator       <- creates a plutus validator from our validator
+valScript = TypedValidator $ toV2 OnChain.validator       -- creates a plutus validator from our validator
 ```
 - in the above functions `onchcain` represents the module in which the validator has been writen
     - it's just importing the validator code
 
 ####  create 2 helper functions that manage the creation of the transactions
 - the producing and the consuming transactions
-```
-use as deadline in datum     plutus type that we'll pass in when doing the transaction
-               vv            vv 
+```haskell
+--use as deadline in datum     plutus type that we'll pass in when doing the transaction
+--               vv            vv 
 lockingTx :: POSIXTime -> UserSpend -> Value -> Tx
 lockingTx dl usp val =
-  mconcat                                  <-- using the monoid functionality of Value
+  mconcat                                  -- using the monoid functionality of Value
     [ userSpend usp
     , payToScript valScript (HashDatum (OnChain.MkCustomDatum dl)) val
-    ]     ^^^                   ^^                ^^ 
-        pays to script         hashing datum     wrapping our deadline in the datum type created at the top of this file
-                          redeemer    user to pay   utxo to spend
-                             vvv          vv            vvv
+    ]--   ^^^                   ^^                ^^ 
+--        pays to script         hashing datum     wrapping our deadline in the datum type created at the top of this file
+--                          redeemer    user to pay   utxo to spend
+--                            vvv          vv            vvv
 consumingTx :: POSIXTime -> Integer -> PubKeyHash -> TxOutRef -> Value -> Tx
 consumingTx dl redeemer usr ref val =
   mconcat
@@ -66,21 +66,21 @@ consumingTx dl redeemer usr ref val =
 
 ## creating the script testing function
 
-```
+```haskell
 testScript :: POSIXTime -> Integer -> Run ()
 testScript d r = do
-  [u1, u2] <- setupUsers
+  [u1, u2] -- setupUsers
   let val = adaValue 100
-  sp <- spend u1 val                         <- spend returns our UserSpend
-  submitTx u1 $ lockingTx d sp val              <- producer tx submitted
+  sp <- spend u1 val                         -- spend returns our UserSpend
+  submitTx u1 $ lockingTx d sp val              -- producer tx submitted
   waitUntil waitBeforeConsumingTx
-  utxos <- utxoAt valScript                     <- get all utxo at validator
+  utxos <- utxoAt valScript                     -- get all utxo at validator
   let [(ref, out)] = utxos
-  ct <- currentTimeRad 100                                  <- Time interval for TxInfoValidRange
-  tx <- validateIn ct $ consumingTx d r u2 ref (txOutValue out)  <- second tx, with validRange and utxo to spend
+  ct <- currentTimeRad 100                                  -- Time interval for TxInfoValidRange
+  tx <- validateIn ct $ consumingTx d r u2 ref (txOutValue out)  -- second tx, with validRange and utxo to spend
   submitTx u2 tx                            
-  [v1, v2] <- mapM valueAt [u1, u2]                     <- final balances of both users
-  unless (v1 == adaValue 900 && v2 == adaValue 1100) $  <- Check if final balances match expected balances
+  [v1, v2] -- mapM valueAt [u1, u2]                     -- final balances of both users
+  unless (v1 == adaValue 900 && v2 == adaValue 1100) $  -- Check if final balances match expected balances
     logError "Final balances are incorrect"
 ```
 - the above code:
@@ -95,7 +95,7 @@ testScript d r = do
 
 ## creating the actual test cases:
 - the good/bad functions and general structure are explained in (2-plutus simple model.md)
-```
+```haskell
 main :: IO ()
 main = defaultMain $ do
     testGroup

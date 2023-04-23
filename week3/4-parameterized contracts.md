@@ -5,7 +5,7 @@ In the previous step (3-a vesting example) we used the datum to pass the benefic
 This is not ideal since we know the rule is that any transaction that wants to spend the output at that script address would need to provide this datum as well
 - it would be more optimal to pass these as script params  
 This is done like so:
-```
+```haskell
 data VestingParams = VestingParams
     { beneficiary :: PubKeyHash
     , deadline    :: POSIXTime
@@ -13,7 +13,7 @@ data VestingParams = VestingParams
 ```
 
 script then changes to: 
-```
+```haskell
 {-# INLINABLE mkParameterizedVestingValidator #-} -- v datum becomes Unit
 mkParameterizedVestingValidator :: VestingParams -> () -> () -> ScriptContext -> Bool
 mkParameterizedVestingValidator params () () ctx =
@@ -27,10 +27,10 @@ mkParameterizedVestingValidator params () () ctx =
     info = scriptContextTxInfo ctx
 
     signedByBeneficiary :: Bool
-    signedByBeneficiary = txSignedBy info $ beneficiary params         <-- params now used
+    signedByBeneficiary = txSignedBy info $ beneficiary params         -- params now used
 
     deadlineReached :: Bool
-    deadlineReached = contains (from $ deadline params) $ txInfoValidRange info <-- params now used
+    deadlineReached = contains (from $ deadline params) $ txInfoValidRange info -- params now used
 ```
 ## This changes the function signature
 
@@ -38,7 +38,7 @@ meaning that the validator compiler will need to be adapted to accept the param
 - (because it expects `BuiltInData -> BuiltInData -> BuiltInData -> ()` signature)
 
 ### Step 1 - update the wrapper:
-```
+```haskell
 {-# INLINABLE  mkWrappedParameterizedVestingValidator #-}
 --                                        note the new param
 --                                         vvv
@@ -49,11 +49,11 @@ mkWrappedParameterizedVestingValidator = wrapValidator . mkParameterizedVestingV
 ```
 
 ### Step 2 - update the validator 
-```
+```haskell
 validator :: VestingParams -> Validator
 validator p = mkValidatorScript $$(compile [|| mkWrappedParameterizedVestingValidator p ||])
 --       ^^                                                                           ^^
-      add p so types are correct                                                add p so types are correct
+--    add p so types are correct                                                add p so types are correct
 ```
 
 # problem:
@@ -73,7 +73,7 @@ note: `Lift` can only be applied to data types, not function type
 
 ## How to fix:
 ### step 1
-```
+```haskell
 validator :: VestingParams -> Validator
 validator params = mkValidatorScript ($$(compile [|| mkWrappedParameterizedVestingValidator ||]) `applyCode` liftCode params)
 --                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^
@@ -82,7 +82,7 @@ validator params = mkValidatorScript ($$(compile [|| mkWrappedParameterizedVesti
 
 ### step 2
 We must make a Lift out of the VestingParams object
-```
+```haskell
 data VestingParams = VestingParams
     { beneficiary :: PubKeyHash
     , deadline    :: POSIXTime

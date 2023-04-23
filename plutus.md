@@ -1,7 +1,7 @@
 # General plutus notes
 
 ### common imports 
-```
+```haskell
 import           Plutus.V2.Ledger.Api      (
                                             BuiltinData, 
                                             POSIXTime, 
@@ -52,7 +52,7 @@ import           Utilities                 (wrapValidator, writeValidatorToFile)
 ```
 
 ### common LANGUAGE options
-```
+```haskell
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
@@ -72,15 +72,15 @@ import           Utilities                 (wrapValidator, writeValidatorToFile)
 
 ### common INLINABLE flags
 
-```
-make inlinable to use in mkWrappedValidator
-      vvvvv
+```haskell
+--make inlinable to use in mkWrappedValidator
+--    vvvvv
 {-# INLINABLE mkValidator #-}
 mkValidator :: DatumSwap -> () -> ScriptContext -> Bool
 mkValidator ds _ ctx = True
 
-make inlinable to use in validator
-            vvvvvv
+-- make inlinable to use in validator
+--         vvvvvv
 {-# INLINABLE  mkWrappedValidator #-}
 mkWrappedValidator :: BuiltinData -> BuiltinData -> BuiltinData -> ()
 mkWrappedValidator = wrapValidator mkValidator
@@ -88,8 +88,8 @@ mkWrappedValidator = wrapValidator mkValidator
 
 validator :: Validator
 validator = mkValidatorScript $$(compile [|| mkWrappedValidator ||])
-                                                ^^^^^
-                                     inlinable mkWrappedValidator
+--                                              ^^^^^
+--                                   inlinable mkWrappedValidator
 ```
 
 #### helpful validator(global) functions

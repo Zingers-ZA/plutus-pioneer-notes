@@ -15,7 +15,7 @@ When a transaction is submitted to a node that tries to spend a utxo owned by a 
 
 ## Simple validator script
 
-```
+```haskell
 --   Name            Datum         Redeemer     ScriptContext   Output Type
 mkGiftValidator :: BuiltInData -> BuiltInData -> BuiltInData -> ()
 mkGiftValidator _ _ _ = ()
@@ -30,7 +30,7 @@ returns ()
 
 ## Compiling to plutus core script
 
-```
+```haskell
 validator :: PlutusV2.Validator
 validator = PlutusV2.mkValidatorScript $$(PlutusTx.compile [|| mkGiftValidator ||])
 ```

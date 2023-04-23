@@ -51,7 +51,7 @@ async function vestFunds(amount: bigint): Promise<TxHash> {
 
 # validators
 
-```
+```typescript
 const vestingScript: SpendingValidator = {
     type: "PlutusV2",
     script: "..."
@@ -63,7 +63,7 @@ const vestingScript: SpendingValidator = {
 
 # utxos:
 
-```
+```typescript
 const vestingScript: SpendingValidator = {
     type: "PlutusV2",
     script: "..."
@@ -95,20 +95,20 @@ await lucid.utxosAt(addr); // [UTxo]
                 - `.submit()` - submit to blockchain, returns `Promise<TxHash>`
 
 - example 1 (producing tx):
-```
+```typescript
 async function vestFunds(amount: bigint): Promise<TxHash> {
     const dtm: Datum = Data.to<VestingDatum>(datum, VestingDatum)
     const tx = await lucid
-        .newTx()                                    <-- create tx
+        .newTx()                                    // create tx
         .payToContract(vestingAddress, { inline: dtm }, { lovelace: amount })
-        .complete()                                 <-- creates TxComplete
-    const signedTx = await tx.sign().complete();    <-- creates signedTx
-    const txHash = await signedTx.submit()          <-- creates txHash
+        .complete()                                 // creates TxComplete
+    const signedTx = await tx.sign().complete();    // creates signedTx
+    const txHash = await signedTx.submit()          // creates txHash
     return txHash;
 }
 ```
 - example 2 (consuming tx):
-```
+```typescript
 async function claimVestedFunds(): Promise<TxHash> {
     const dtm: Datum = Data.to<VestingDatum>(datum,VestingDatum);
     const utxoAtScript: UTxO[] = await lucid.utxosAt(vestingAddress);
@@ -116,13 +116,13 @@ async function claimVestedFunds(): Promise<TxHash> {
     
     if (ourUTxO && ourUTxO.length > 0) {
         const tx = await lucid
-            .newTx()                                   <-- create tx
-            .collectFrom(ourUTxO, Data.void())         <-- utxos to use
+            .newTx()                                   // create tx
+            .collectFrom(ourUTxO, Data.void())         // utxos to use
 //                                ^^^^^^^^^
 //                  redeemer for utxo(multiple if multiple utxos)
-            .addSignerKey(beneficiaryPKH)              <-- specify a certain signature necessary    
-            .attachSpendingValidator(vestingScript)    <-- attach script 
-            .validFrom(Date.now()-100000)              <-- sets txInfo.txInfoValidRange
+            .addSignerKey(beneficiaryPKH)              // specify a certain signature necessary    
+            .attachSpendingValidator(vestingScript)    // attach script 
+            .validFrom(Date.now()-100000)              // sets txInfo.txInfoValidRange
             .complete();
 
         const signedTx = await tx.sign().complete();

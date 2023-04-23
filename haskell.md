@@ -6,7 +6,7 @@
 - `.` - the Dot operator
     - also results in less parenthesis but that is not the aim
     - it's function is to `chain functions`, it creates a single function from more than one function
-    ```
+    ```haskell
     let second = head . tail
     second "asdf"
     -- 's'
@@ -26,7 +26,7 @@
 
 ### importing modules
 
-```
+```haskell
 import Data.List
 import System.IO
 ```
@@ -45,21 +45,21 @@ import System.IO
 
 <b>Declaring vars:</b>
 
-```
+```haskell
 always5 :: Int
 always5 = 5
 ```
 
 ### Custom types:
 - use `data` to define a custom type
-```
+```haskell
     
        name         property types 
         vv       vvv vvvvvv vvvvvv vvvv
 data Customer String String String Double
 ```
 different syntax:
-```
+```haskell
 data Employee = Employee { 
                            name :: String,
                            position :: String,
@@ -75,7 +75,7 @@ data Dog = Dog {
 ```
 
 #### populating a type (creating an object, but not)
-```
+```haskell
 tomSmith :: Customer
 tomSmith = Customer "Tom" "123 Main" 12.50
 
@@ -83,11 +83,11 @@ employeeSmith :: Employee
 employeeSmith = Employee {name = "employee smith", position = "boss", id = 123}
 
 getBalance :: Customer -> Double
-getBalance (Customer _ _ b) = b      <-- strips out balance and returns
+getBalance (Customer _ _ b) = b  -- strips out balance and returns
 ```
 
 Custom data types with options (basically enum)
-```
+```haskell
 data Shape = Circle Float Float Float | Rectangle Float Float Float Float
 ```
 - shape can be either Circle or Rectangle
@@ -105,7 +105,7 @@ examples: `Num`
 - use `_` for ignored input params
 
 do (allows chaining operations):
-```
+```haskell
 main = do
     putStrLn "ayo"
     name <- getLine
@@ -113,11 +113,11 @@ main = do
 ```
 - the `<-` above runs the getLine function(gets input from terminal) and saves it as the name on the left
 normal syntax:
-```
+```haskell
 --  arg1type  arg2type  returnType
 --       vv      vv     vv
 addme :: Int -> Int -> Int
-addMe x y = x + y            < -- operation
+addMe x y = x + y -- operation
 --    ^^^
 -- param names
 ```
@@ -128,15 +128,15 @@ addMe x y = x + y
 - uses type inference
 
 #### syntax for <u>type classes</u>:
-```
- shows that all "a's" should have an instance of the type class "Num"
-         vvvv
+```haskell
+--shows that all "a's" should have an instance of the type class "Num"
+--       vvvv
 addme :: Num a => a -> a -> a
 addMe x y = x + y
 ```
 
 #### functions can also overload
-```
+```haskell
 whatAge :: Int -> String
 whatAge 16 = "You can drive"
 whatAge 18 = "You can vote"
@@ -146,7 +146,7 @@ whatAge x = "Nothing Important"
 
 ### High order functions
 - passing functions to other functions as if they were values
-```
+```haskell
 times4 :: Int -> Int
 time4 x = x * 4
 
@@ -156,22 +156,22 @@ listTimes4 = map times4 [1,2,3,4,5]
 ```
 
 `receive` a function is as follows:
-```
+```haskell
 -- (Int -> Int) says we expect a function that receives Int and returns an Int
 doMult :: (Int -> Int) -> Int
 doMult func = func 3
-       ^^^^
-       this is now the function we got in which takes an Int and returns an Int
+--     ^^^^
+--     this is now the function we got in which takes an Int and returns an Int
 ```
 
 ### lambda functions 
 - lambdas act like custom unnamed functions
 - `(\x -> x + 1) 4` = `5 :: Integer`
 
-```
+```haskell
 dbl1To10 = map (\x -> x * 2) [1..10]
-                ^^ 
-                lambda function
+--              ^^ 
+--              lambda function
 ```
 the above code applies the lambda to each element in the range (1 to 10) through the use of map
 
@@ -234,7 +234,7 @@ myList3 = [x | x <- [0..500], x * 3 <= 50]
 - `snd bob` = 52
 
 # recursion
-```
+```haskell
 factorial :: Int -> Int
 factorial 0 = 1                       <-- exit condition
 factorial n = n * factorial (n - 1)
@@ -243,15 +243,15 @@ factorial n = n * factorial (n - 1)
 # Guards
 - kinda like switch 
 - pattern matching
-```
+```haskell
 isOdd :: Int -> Bool
 isOdd n
     | n `mod` 2 == 0 = False
-   ^^  ^^^^^^^^^^^^     ^^ 
- Guard   expression     output
+--   ^^  ^^^^^^^^^^^^     ^^ 
+-- Guard   expression     output
 ```
 `otherwise`:
-```
+```haskell
 isOdd :: Int -> Bool
 isOdd n
     | n `mod` 2 == 0 = False
@@ -261,7 +261,7 @@ isOdd n
 # where
 - uses `guards` to define switch of options
 - `where` then is at the bottom and populates the vars that the guards use
-```
+```haskell
 batAvgRating :: Double -> Double -> String
 batAvgRating hits atBats
 	| avg <= 0.200 = "Terrible Batting Average"
@@ -269,12 +269,12 @@ batAvgRating hits atBats
 	| avg <= 0.280 = "Your doing pretty good"
 	| otherwise = "You're a Superstar"
 	where avg = hits / atBats 
-      ^^^^^^
-    vars defined here
+--      ^^^^^^
+--    vars defined here
 ```
 
 # if
-```
+```haskell
 doubleEvenOnly y = 
     if (y `mod` 2 /= 0)
         then y
@@ -284,7 +284,7 @@ doubleEvenOnly y =
 
 # case
 
-```
+```haskell
 getClass :: Int -> String
 getClass n = case n of
     5 -> "Go to Kindergarten"
@@ -296,9 +296,9 @@ similar to guards except used for values instead of patterns
 
 # enumerations
 - list of possible types
-```
-                      enums denoted with |
-                     vvvvvvvvvvvvvvvvv
+```haskell
+--                    enums denoted with |
+--                   vvvvvvvvvvvvvvvvv
 data BaseballPlayer = Pitcher | Catcher
 
 -- can also be on different lines

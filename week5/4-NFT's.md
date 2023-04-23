@@ -15,9 +15,9 @@ https://www.youtube.com/watch?v=9kW-z_RuwEY&list=PLNEK_Ejlx3x2T1lIR4XnDILKukj3rP
         - because it must contain at least one utxo to pay fees
 - Therefore, if we can `bake a utxo into a script`, and then consume that utxo in the same transaction as the script, it will prevent the script from ever succeeding again since the utxo can never exist again.
 
-```
-           utxo as param    token name as param
-                vvvvvv       vvvv
+```haskell
+--         utxo as param    token name as param
+--              vvvvvv       vvvv
 mkNFTPolicy :: TxOutRef -> TokenName -> () -> ScriptContext -> Bool
 mkNFTPolicy oref tn () ctx = traceIfFalse "UTxO not consumed"   hasUTxO           &&
                              traceIfFalse "wrong amount minted" checkMintedAmount
@@ -25,17 +25,17 @@ mkNFTPolicy oref tn () ctx = traceIfFalse "UTxO not consumed"   hasUTxO         
     info :: TxInfo
     info = scriptContextTxInfo ctx
 
-    hasUTxO :: Bool                                                 <--  make sure utxo is consumed by this tx
+    hasUTxO :: Bool                                                 --  make sure utxo is consumed by this tx
     hasUTxO = any (\i -> txInInfoOutRef i == oref) $ txInfoInputs info
 
     checkMintedAmount :: Bool
     checkMintedAmount = case flattenValue (txInfoMint info) of
-        [(_, tn'', amt)] -> tn'' == tn && amt == 1                  <-- tokenName correct and amount = 1
+        [(_, tn'', amt)] -> tn'' == tn && amt == 1                  -- tokenName correct and amount = 1
         _                -> False
 ```
 #### code required for compilation
 
-```
+```haskell
 {-# INLINABLE mkWrappedNFTPolicy #-}
 mkWrappedNFTPolicy :: BuiltinData -> BuiltinData -> BuiltinData -> BuiltinData -> BuiltinData -> ()
 mkWrappedNFTPolicy tid ix tn' = wrapPolicy $ mkNFTPolicy oref tn
@@ -78,11 +78,11 @@ saveNFTPolicy oref tn = writePolicyToFile
         (BuiltinByteString bs) -> BS8.unpack $ bytesToHex bs
 ```
 #### lucid interaction with script
-```
+```typescript
 const utxos = await lucid.utxosAt(addr);
-const utxo = utxos[0];                        <-- find a utxo to use, can just be the first
+const utxo = utxos[0];                        // find a utxo to use, can just be the first
 
-const tn = fromText("PPP NFT");    <-- token name
+const tn = fromText("PPP NFT");    // token name
 
 const Params = Data.Tuple([Data.String, Data.BigInt, Data.String]);
 type Params = Data.Static<typeof Params>;
@@ -91,18 +91,18 @@ const nftPolicy: MintingPolicy = {
     type: "PlutusV2",
     script: applyParamsToScript<Params>(
         "5909...011",
-        [utxo.txHash, BigInt(utxo.outputIndex), tn],  <-- params to be applied
+        [utxo.txHash, BigInt(utxo.outputIndex), tn],  // params to be applied
         Params)
 };
 
-const policyId: PolicyId = lucid.utils.mintingPolicyToId(nftPolicy);    <-- gets policyId(minting policy script)
+const policyId: PolicyId = lucid.utils.mintingPolicyToId(nftPolicy);    // gets policyId(minting policy script)
 
 const unit: Unit = policyId + tn;
 
 const tx = await lucid
     .newTx()
-    .mintAssets({[unit]: 1n}, Data.void())                    <-- mint 1 asset of our AssetClass(tokenName+policyId)
-    .attachMintingPolicy(nftPolicy)                           <-- attached minting policy
+    .mintAssets({[unit]: 1n}, Data.void())                    // mint 1 asset of our AssetClass(tokenName+policyId)
+    .attachMintingPolicy(nftPolicy)                           // attached minting policy
     .collectFrom([utxo])
     .complete();
 ```

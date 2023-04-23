@@ -23,7 +23,7 @@
 
 # Utxos:
 
-```
+```typescript
 const vestingScript: SpendingValidator = {
     type: "PlutusV2",
     script: "..."
@@ -49,7 +49,7 @@ await lucid.utxosAt(addr); // [UTxo]
     - `Data.from<type>(string, shape)` allows converting an cbor string to an object, given it's shape and type
 
 Must be used for datum/redeemer/etc.
-```
+```typescript
 const MyDatum = Data.Object({
   name: Data.Bytes(),
   age: Data.Integer(),
@@ -60,7 +60,7 @@ type MyDatum = Data.Static<typeof MyDatum>;
 ```
 - this is only illustrating the shape of the datum
 - when you provide this in a transaction, you must convert strings to bytes:
-```
+```typescript
   const datum: MyDatum = {
     name: fromText("Lucid"),
     age: 0n,
@@ -69,9 +69,9 @@ type MyDatum = Data.Static<typeof MyDatum>;
   };
 ```
 submitting: 
-```
-const tx = await lucid                     type here     json      Data.Object
-  .newTx()                                      vvvv     vvv       vvv
+```typescript
+const tx = await lucid                   //  type here     json   Data.Object
+  .newTx()                               //      vvvv     vvv       vvv
   .payToAddressWithData("addr_test...", Data.to<MyDatum>(datum, MyDatum), {
     lovelace: 10000000n,
   })
@@ -103,20 +103,20 @@ const tx = await lucid                     type here     json      Data.Object
                 - `.submit()` - submit to blockchain, returns `Promise<TxHash>`
 
 - example 1 (producing tx):
-```
+```typescript
 async function vestFunds(amount: bigint): Promise<TxHash> {
     const dtm: Datum = Data.to<VestingDatum>(datum, VestingDatum)
     const tx = await lucid
-        .newTx()                                    <-- create tx
+        .newTx()                                    // create tx
         .payToContract(vestingAddress, { inline: dtm }, { lovelace: amount })
-        .complete()                                 <-- creates TxComplete
-    const signedTx = await tx.sign().complete();    <-- creates signedTx
-    const txHash = await signedTx.submit()          <-- creates txHash
+        .complete()                                 // creates TxComplete
+    const signedTx = await tx.sign().complete();    // creates signedTx
+    const txHash = await signedTx.submit()          // creates txHash
     return txHash;
 }
 ```
 - example 2 (consuming tx):
-```
+```typescript
 async function claimVestedFunds(): Promise<TxHash> {
     const dtm: Datum = Data.to<VestingDatum>(datum,VestingDatum);
     const utxoAtScript: UTxO[] = await lucid.utxosAt(vestingAddress);
@@ -124,13 +124,13 @@ async function claimVestedFunds(): Promise<TxHash> {
     
     if (ourUTxO && ourUTxO.length > 0) {
         const tx = await lucid
-            .newTx()                                   <-- create tx
-            .collectFrom(ourUTxO, Data.void())         <-- utxos to use
+            .newTx()                                   // create tx
+            .collectFrom(ourUTxO, Data.void())         // utxos to use
 //                                ^^^^^^^^^
 //                  redeemer for utxo(multiple if multiple utxos)
-            .addSignerKey(beneficiaryPKH)              <-- specify a certain signature necessary    
-            .attachSpendingValidator(vestingScript)    <-- attach script 
-            .validFrom(Date.now()-100000)              <-- sets txInfo.txInfoValidRange
+            .addSignerKey(beneficiaryPKH)              // specify a certain signature necessary    
+            .attachSpendingValidator(vestingScript)    // attach script 
+            .validFrom(Date.now()-100000)              // sets txInfo.txInfoValidRange
             .complete();
 
         const signedTx = await tx.sign().complete();
@@ -154,7 +154,7 @@ there are a few functions commonly used during tx building
 
 # validators/scripts 
 
-```
+```typescript
 const vestingScript: SpendingValidator = {
     type: "PlutusV2",
     script: "..."
@@ -176,7 +176,7 @@ quick recap:
 - script params are compiled into the script before a transaction can produce an output that sits at that script address
 - this means that if one of your params needs to come from the user, you need to compile the script on the fly with their param
 - lucid does this with `applyParamsToScript`. Eg:
-```
+```typescript
 const addr: Address = await lucid.wallet.address();
 
 const pkh: string = getAddressDetails(addr).paymentCredential?.hash || "";
@@ -196,16 +196,16 @@ const signedPolicy: MintingPolicy = {
     - partially compiled because this must be compiled without the params, so they can be applied later
 
 #### applying an object as script parameter from lucid:
-```
-              must be tuple for params
-                        vvv 
+```typescript
+//            must be tuple for params
+//                      vvv 
 const ParamShape = Data.Tuple(
     [Data.Object({
         owner: Data.Bytes(),
         tokenName: Data.Bytes()
     })]
-      ^^
-    typle requires array
+//   ^^
+//  tuple requires array
 )
 type TParamShape = Data.Static<typeof ParamShape>;
 
@@ -231,26 +231,26 @@ const policy: MintingPolicy = {
 - Lucid uses a type called `Unit` to represent `AssetClass`
 - `fromText` is usefull to convert ascii(human) text to hex
 
-```
+```typescript
 const freePolicy: MintingPolicy = {
     type: "PlutusV2",
     script: "5830582e010000323222320053333573466e1cd55ce9baa0024800080148c98c8014cd5ce249035054310000500349848005"
 };
 
 const policyId: PolicyId = lucid.utils.mintingPolicyToId(freePolicy);
-                                        ^^^^^
-                       gets policyId(script hash) from minting policy
+//                                      ^^^^^
+//                     gets policyId(script hash) from minting policy
 
 const unit: Unit = policyId + fromText("PPP Free");
-           ^^^             ^^^^^^
-  create 'assetclass'    CurrencySymbol + tokenName
+//         ^^^             ^^^^^^
+// create 'assetclass'    CurrencySymbol + tokenName
 
 const tx = await lucid
     .newTx()
-    .mintAssets({[unit]: 10000}, Data.void())         <-- minting assets: contains Value, and redeemer
-                  ^^      ^^         ^^
-            assetClass   amount      redeemer
-    .attachMintingPolicy(freePolicy)                  <-- attach actual script to tx
+    .mintAssets({[unit]: 10000}, Data.void())  // minting assets: contains Value, and redeemer
+//                ^^      ^^         ^^
+//          assetClass   amount      redeemer
+    .attachMintingPolicy(freePolicy)           // attach actual script to tx
     .complete();
 
 const signedTx = await tx.sign().complete();
