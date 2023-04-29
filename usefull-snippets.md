@@ -15,7 +15,23 @@ parseDatum o info = case txOutDatum o of
 
 ### Checking if utxo contains token/assetclass
 ```haskell
+consumesInputWithToken :: Bool
+consumesInputWithToken = assetClassValueOf (txOutValue someInput) (AssetClass(someCurrencySymbol, someTokenName)) == 1
 
+mintsUtxoWithToken :: Bool
+mintsUtxoWithToken = assetClassValueOf (txInfoMint txInfo) (AssetClass(ownCurrencySymbol ctx, myName)) == 1
+```
+
+### Check outputs that are paid to validator 
+```haskell
+ownOutputs :: [TxOut}
+ownOutputs = getContinuingOutputs ctx
+
+-- incase only expect one
+ownOutput :: TxOut
+ownOutput = case getContinuingOutputs ctx of
+    [o] -> o
+    _   -> traceError "expected only one output at script"
 ```
 
 ### Using redeemer as action
@@ -31,4 +47,12 @@ validator p d r ctx = case r of
                 Update -> ...
                 Delete -> ...
 ...
+```
+On the frontend:
+```ts
+const OracleRedeemer = Data.Enum([
+    Data.Literal("Update"),
+    Data.Literal("Delete"),
+])
+type OracleRedeemer = Data.Static<typeof OracleRedeemer>;
 ```
