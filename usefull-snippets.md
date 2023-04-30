@@ -24,7 +24,7 @@ mintsUtxoWithToken = assetClassValueOf (txInfoMint txInfo) (AssetClass(ownCurren
 
 ### Check outputs that are paid to validator 
 ```haskell
-ownOutputs :: [TxOut}
+ownOutputs :: [TxOut]
 ownOutputs = getContinuingOutputs ctx
 
 -- incase only expect one
