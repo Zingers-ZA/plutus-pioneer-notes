@@ -133,3 +133,9 @@ validator = mkValidatorScript $$(compile [|| mkWrappedValidator ||])
 
 - Convert a CurrencySymbol to a ValidatorHash  
 `fromSymbol :: CurrencySymbol -> ValidatorHash`
+
+### Repl:
+- to use strings in repl
+```
+:set -XOverloadedStrings
+```
