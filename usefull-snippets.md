@@ -1,5 +1,43 @@
 # Useful code snippets
 
+### Int to builinByteString 
+```hs
+
+{-# INLINEABLE intToBuiltinByteString #-}
+intToBuiltinByteString :: Integer -> BuiltinByteString
+intToBuiltinByteString i = encodeUtf8 $ intToString i
+
+{-# INLINEABLE intToString #-}
+intToString :: Integer -> BuiltinString
+intToString i = foldr appendString "" strings
+  where
+    ints = intToInts i
+    strings = map intToChar ints
+
+{-# INLINEABLE intToInts #-}
+intToInts :: Integer -> [Integer]
+intToInts i
+  | equalsInteger a 0 = [b]
+  | otherwise = intToInts a ++ [b]
+  where
+    (a, b) = divMod i 10
+
+{-# INLINEABLE intToChar #-}
+intToChar :: Integer -> BuiltinString
+intToChar i
+  | equalsInteger i 0 = "0"
+  | equalsInteger i 1 = "1"
+  | equalsInteger i 2 = "2"
+  | equalsInteger i 3 = "3"
+  | equalsInteger i 4 = "4"
+  | equalsInteger i 5 = "5"
+  | equalsInteger i 6 = "6"
+  | equalsInteger i 7 = "7"
+  | equalsInteger i 8 = "8"
+  | equalsInteger i 9 = "9"
+  | otherwise = "0" -- not possible
+```
+
 ### Get datum(inline or hash)
 ```haskell
 parseDatum :: TxOut -> TxInfo -> Maybe Integer -- whatever type the datum returns 
